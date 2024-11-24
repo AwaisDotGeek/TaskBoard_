@@ -19,6 +19,7 @@ function App() {
   const [showCreateNewTask_Modal, setShowCreateNewTask_Modal] = useState(false);
   
   const [idOfListTheTaskIsBeingAddedTo, setIdOfListTheTaskIsBeingAddedTo] = useState(0);
+  const [theTaskBeingEdited, setTheTaskBeingEdited] = useState(null);
 
   // This function helps scroll to a specific card
   const scrollToCard = (id) => {
@@ -101,18 +102,44 @@ function App() {
     }
   };
   const handleNewTask = (taskDesc) => {
-    saveNewTaskToStorage(taskDesc);
+    if (theTaskBeingEdited) {
+      theTaskBeingEdited.title = taskDesc;
+
+      // save updated in localStorage
+      if (theTaskBeingEdited.listId > mock_lists.length) {
+        const storedTasks = getTasksFromLocalStorage();
+        if (storedTasks) {
+          const updatedTasks = storedTasks.map((task) =>
+            task.id === theTaskBeingEdited.id ? theTaskBeingEdited : task
+          );
+          localStorage.setItem('todos-tasks', JSON.stringify(updatedTasks));
+        }
+      }
+    } else {
+      saveNewTaskToStorage(taskDesc);
+    }
+  }
+
+  // Edit a Task
+  const handleEditTask = (taskToEdit) => {
+    setShowCreateNewTask_Modal(true);
+    console.log(theTaskBeingEdited);
+    setTheTaskBeingEdited(taskToEdit);
   }
 
   // Delete a Task
   const handleDeleteTask = (taskToDelete) => {
     if (taskToDelete.listId > mock_lists.length) {
-      // update local storage also
-    } else {
-      const tasksToKeep = tasks.filter((task) => { return task.id !== taskToDelete.id });
-      setTasks([...tasksToKeep]);
+        const storedTasks = getTasksFromLocalStorage();
+        if (storedTasks) {
+            const updatedTasks = storedTasks.filter((task) => task.id !== taskToDelete.id);
+            localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+        }
     }
-  }
+
+    const tasksToKeep = tasks.filter((task) => task.id !== taskToDelete.id);
+    setTasks([...tasksToKeep]);
+  };
 
   // For Lists
   useEffect(() => {
@@ -147,7 +174,8 @@ function App() {
           tasks = { tasks } 
           cardRefs = { cardRefs } 
           containerRef={ containerRef } 
-          showNewTaskModal={ showNewTaskModal } 
+          showNewTaskModal={ showNewTaskModal }
+          onEdit = { handleEditTask } 
           onDelete = { handleDeleteTask }
         />
       </div>
@@ -156,7 +184,15 @@ function App() {
 
       {/* Create New List Modal */}
       <CreateNewList isModalVisible={showCreateNewList_Modal} onSubmit={handleNewList} onClose={() => setShowCreateNewList_Modal(false)} />
-      <CreateNewTask isModalVisible={showCreateNewTask_Modal} onSubmit={handleNewTask} onClose={() => setShowCreateNewTask_Modal(false)}/>
+      <CreateNewTask 
+        isModalVisible={showCreateNewTask_Modal} 
+        onSubmit={handleNewTask} 
+        onClose={() => {
+          setShowCreateNewTask_Modal(false); 
+          setTheTaskBeingEdited(null);
+          console.log(theTaskBeingEdited);
+        }} 
+        taskToEdit={theTaskBeingEdited}/>
     </div>
   )
 }

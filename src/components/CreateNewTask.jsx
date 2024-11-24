@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const CreateNewTask = ({ isModalVisible, onSubmit, onClose }) => {
-    const [taskDescription, setTaskDescription] = useState("");
+const CreateNewTask = ({ taskToEdit, isModalVisible, onSubmit, onClose }) => {
+    const [taskDescription, setTaskDescription] = useState('');
     const [showError, setShowError] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -23,6 +24,16 @@ const CreateNewTask = ({ isModalVisible, onSubmit, onClose }) => {
         }
     };
 
+    useEffect(() => {
+        if (taskToEdit) {
+            setTaskDescription(taskToEdit.title);
+            setIsEditing(true);
+        } else {
+            setTaskDescription('');
+            setIsEditing(false);
+        }
+    }, [taskToEdit]);
+
     return (
         <div
             onClick={onClose}
@@ -39,7 +50,7 @@ const CreateNewTask = ({ isModalVisible, onSubmit, onClose }) => {
                     ×
                 </button>
 
-                <h2 className="text-xl font-bold mb-4">Create New Task</h2>
+                <h2 className="text-xl font-bold mb-4">{isEditing ? 'Edit Task' : 'Create New Task'}</h2>
 
                 <input
                     type="text"
