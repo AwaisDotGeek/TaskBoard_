@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const CreateNewList = ({ isModalVisible, onSubmit, onClose }) => {
+const CreateNewList = ({ listToEdit, isModalVisible, onSubmit, onClose }) => {
     const [listTitle, setListTitle] = useState("");
     const [showError, setShowError] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -23,6 +24,16 @@ const CreateNewList = ({ isModalVisible, onSubmit, onClose }) => {
         }
     };
 
+    useEffect(() => {
+        if (listToEdit) {
+            setListTitle(listToEdit.name);
+            setIsEditing(true);
+        } else {
+            setListTitle('');
+            setIsEditing(false);
+        }
+    }, [listToEdit]);
+
     return (
         <div
             onClick={onClose}
@@ -37,7 +48,7 @@ const CreateNewList = ({ isModalVisible, onSubmit, onClose }) => {
                     ×
                 </button>
 
-                <h2 className="text-xl font-bold mb-4">Create New List</h2>
+                <h2 className="text-xl font-bold mb-4">{isEditing ? 'Edit List' : 'Create New List'}</h2>
 
                 <input
                     type="text"

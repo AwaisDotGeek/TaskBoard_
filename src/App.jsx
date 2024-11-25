@@ -20,6 +20,7 @@ function App() {
   
   const [idOfListTheTaskIsBeingAddedTo, setIdOfListTheTaskIsBeingAddedTo] = useState(0);
   const [theTaskBeingEdited, setTheTaskBeingEdited] = useState(null);
+  const [theListBeingEdited, setTheListBeingEdited] = useState(null);
 
   // This function helps scroll to a specific card
   const scrollToCard = (id) => {
@@ -27,7 +28,7 @@ function App() {
     const container = containerRef.current;
 
     if (targetRef && container) {
-      const targetPosition = targetRef.offsetLeft - container.scrollLeft;
+      const targetPosition = targetRef.offsetLeft - container.scrollLeft - 25;
 
       container.scrollTo({
           left: container.scrollLeft + targetPosition - container.clientWidth / 2 + targetRef.clientWidth / 2,
@@ -73,8 +74,22 @@ function App() {
   };
 
   const handleNewList = (listTitle) => {
-    saveNewListToStorage(listTitle);
-    // localStorage.clear();
+    if (theListBeingEdited) {
+      theListBeingEdited.name = listTitle;
+
+      // save updated in localStorage
+      if (theListBeingEdited.id > mock_lists.length) {
+        const storedLists = getTasksFromLocalStorage();
+        if (storedLists) {
+          const updatedLists = storedLists.map((list) =>
+            list.id === theListBeingEdited.id ? theListBeingEdited : list
+          );
+          localStorage.setItem('todos-lists', JSON.stringify(updatedLists));
+        }
+      }
+    } else {
+      saveNewListToStorage(listTitle);
+    }
   };
 
   // Add new Task
@@ -123,7 +138,6 @@ function App() {
   // Edit a Task
   const handleEditTask = (taskToEdit) => {
     setShowCreateNewTask_Modal(true);
-    console.log(theTaskBeingEdited);
     setTheTaskBeingEdited(taskToEdit);
   }
 
@@ -140,6 +154,57 @@ function App() {
     const tasksToKeep = tasks.filter((task) => task.id !== taskToDelete.id);
     setTasks([...tasksToKeep]);
   };
+
+  // Edit a Task
+  const handleEditList = (listToEdit) => {
+    setShowCreateNewList_Modal(true);
+    setTheListBeingEdited(listToEdit);
+  }
+
+  // Delete a Task
+  const handleDeleteList = (listToDelete) => {
+    if (listToDelete.id > mock_lists.length) {
+      const storedTasks = getTasksFromLocalStorage();
+      const storedLists = getListsFromStorage();
+      if (storedTasks) {
+          const updatedTasks = storedTasks.filter((task) => task.listId !== listToDelete.id);
+          localStorage.setItem('todos-tasks', JSON.stringify(updatedTasks));
+
+          const updatedLists = storedLists.filter((list) => list.id !== listToDelete.id);
+          localStorage.setItem('todos-lists', JSON.stringify(updatedLists));
+
+      }
+    }
+
+    const tasksToKeep = tasks.filter((task) => task.listId !== listToDelete.id);
+    setTasks([...tasksToKeep]);
+
+    const listsToKeep = lists.filter((list) => list.id !== listToDelete.id);
+    setLists([...listsToKeep]);
+  };
+
+  // Mark as Completed
+  const handleCompleted = (task) => {
+    const updatedTask = { ...task, completed: !task.completed };
+
+    if (task.listId > mock_lists.length) {
+        const storedTasks = getTasksFromLocalStorage();
+        if (storedTasks) {
+            const updatedTasks = storedTasks.map((t) =>
+                t.id === task.id ? updatedTask : t
+            );
+            localStorage.setItem("todos-tasks", JSON.stringify(updatedTasks));
+        }
+    }
+
+    // Update in the current tasks state
+    const updatedTasks = tasks.map((t) =>
+        t.id === task.id ? updatedTask : t
+    );
+    setTasks(updatedTasks);
+  };
+
+
 
   // For Lists
   useEffect(() => {
@@ -177,22 +242,34 @@ function App() {
           showNewTaskModal={ showNewTaskModal }
           onEdit = { handleEditTask } 
           onDelete = { handleDeleteTask }
+          onEditList={ handleEditList }
+          onDeleteList={ handleDeleteList }
+          onCompleted={ handleCompleted }
         />
       </div>
 
       <Footer />
 
       {/* Create New List Modal */}
-      <CreateNewList isModalVisible={showCreateNewList_Modal} onSubmit={handleNewList} onClose={() => setShowCreateNewList_Modal(false)} />
+      <CreateNewList 
+        isModalVisible={showCreateNewList_Modal} 
+        onSubmit={handleNewList} 
+        onClose={() => {
+          setShowCreateNewList_Modal(false);
+          setTheListBeingEdited(null);
+        }} 
+        listToEdit={theListBeingEdited}
+      />
+
       <CreateNewTask 
         isModalVisible={showCreateNewTask_Modal} 
         onSubmit={handleNewTask} 
         onClose={() => {
           setShowCreateNewTask_Modal(false); 
           setTheTaskBeingEdited(null);
-          console.log(theTaskBeingEdited);
         }} 
-        taskToEdit={theTaskBeingEdited}/>
+        taskToEdit={theTaskBeingEdited}
+      />
     </div>
   )
 }
