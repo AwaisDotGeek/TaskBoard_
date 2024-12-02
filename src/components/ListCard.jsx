@@ -41,7 +41,7 @@ const ListCard = forwardRef(({ list, tasks, showNewTaskModal, onEditTask, onDele
                             key={index}
                             className="px-2 py-1 flex justify-between cursor-pointer hover:bg-[#D4EBF8]"
                         >
-                            <span onClick={() => onCompleted(task)}>{task.title}</span>
+                            <span className="flex-1" onClick={() => onCompleted(task)}>{task.title}</span>
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => onEditTask(task)}
@@ -67,7 +67,7 @@ const ListCard = forwardRef(({ list, tasks, showNewTaskModal, onEditTask, onDele
                             key={index}
                             className="px-2 py-1 flex justify-between cursor-pointer hover:bg-[#D4EBF8]"
                         >
-                            <span onClick={() => onCompleted(task)} className="line-through text-gray-500">{task.title}</span>
+                            <span onClick={() => onCompleted(task)} className="flex-1 line-through text-gray-500">{task.title}</span>
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => onDeleteTask(task)}

@@ -10,8 +10,8 @@ import CreateNewTask from './components/CreateNewTask'
 import mockData from './assets/mockData.json'
 function App() {
   const { mock_lists, mock_tasks } = mockData;
-  const [lists, setLists] = useState(mock_lists);
-  const [tasks, setTasks] = useState(mock_tasks);
+  const [lists, setLists] = useState(mock_lists ? mock_lists : []);
+  const [tasks, setTasks] = useState(mock_tasks ? mock_tasks : []);
   const cardRefs = useRef({});
   const containerRef = useRef(null);
 
@@ -99,7 +99,7 @@ function App() {
   }
   const saveNewTaskToStorage = (listDesc) => {
     try {  
-      const newTaskId = tasks[tasks.length - 1].id + 1; 
+      const newTaskId = tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1; 
       const newTask = {
         id: newTaskId,
         title: listDesc,
@@ -147,7 +147,7 @@ function App() {
         const storedTasks = getTasksFromLocalStorage();
         if (storedTasks) {
             const updatedTasks = storedTasks.filter((task) => task.id !== taskToDelete.id);
-            localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+            localStorage.setItem('todos-tasks', JSON.stringify(updatedTasks));
         }
     }
 
