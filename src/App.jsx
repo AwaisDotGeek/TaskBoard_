@@ -41,7 +41,7 @@ function App() {
       // Remove the highlight class after the animation ends (1s here)
       setTimeout(() => {
           targetRef.classList.remove("highlight");
-      }, 2000);
+      }, 2000); 
     }
   };
 
