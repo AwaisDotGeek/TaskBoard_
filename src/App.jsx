@@ -34,7 +34,15 @@ function App() {
           left: container.scrollLeft + targetPosition - container.clientWidth / 2 + targetRef.clientWidth / 2,
           behavior: "smooth",
       });
-  }
+
+      // Add the highlight class for animation
+      targetRef.classList.add("highlight");
+
+      // Remove the highlight class after the animation ends (1s here)
+      setTimeout(() => {
+          targetRef.classList.remove("highlight");
+      }, 2000);
+    }
   };
 
   // To show modal for creating new list

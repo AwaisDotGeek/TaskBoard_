@@ -3,7 +3,7 @@ const SidePanel = ({ lists, scrollToCard, showNewListModal }) => {
         <div className="h-full bg-[#1F509A] text-white min-w-[250px] flex flex-col justify-between shadow-md border-r-[1px] border-gray-300">
             {/* Header */}
             <div className="border-b-[2px] border-[#D4EBF8]">
-                <h2 className="text-center py-4 font-bold tracking-wide">Lists</h2>
+                <h2 className="text-center py-2 font-bold tracking-wide">Lists</h2>
             </div>
 
             {/* List Items */}
